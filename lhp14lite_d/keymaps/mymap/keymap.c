@@ -882,5 +882,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 };
 
+#include "analog.h"
+
+report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
+    mouse_report.x = analogReadPin(JOYSTICK_X_PIN) - 512;
+    mouse_report.y = analogReadPin(JOYSTICK_Y_PIN) - 512;
+    return mouse_report;
+}
 
 
