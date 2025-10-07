@@ -56,7 +56,7 @@
 
 void render_logo(void) {
     oled_set_cursor(0, 0);
-    oled_write_P(lhp_logo, false);
+ 
 };
 
 enum custom_keycodes {
