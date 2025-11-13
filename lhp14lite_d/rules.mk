@@ -1,4 +1,14 @@
+# MCU設定
+MCU = atmega32u4
+BOOTLOADER = caterina
+
+# 機能有効化
 JOYSTICK_ENABLE = yes
-JOYSTICK_DRIVER = analog
-LTO_ENABLE = yes
+POINTING_DEVICE_ENABLE = yes
+POINTING_DEVICE_DRIVER = analog_joystick
+MOUSEKEY_ENABLE = yes
+ANALOG_DRIVER_ENABLE = yes
+OLED_ENABLE = yes
+RGBLIGHT_ENABLE = yes
+
 
