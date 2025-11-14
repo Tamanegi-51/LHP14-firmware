@@ -1,16 +1,25 @@
-// Copyright 2023 Neo Trinity
-// SPDX-License-Identifier: GPL-2.0-or-later
-
 #pragma once
 
+#include "config_user.h"
 
-#define JOYSTICK_BUTTON_COUNT 1
-#define JOYSTICK_AXIS_COUNT 2
-#define JOYSTICK_AXIS_RESOLUTION 8
+/* USB設定 */
+#define VENDOR_ID       0xFEED
+#define PRODUCT_ID      0x0001
+#define DEVICE_VER      0x0001
+#define MANUFACTURER    YourName
+#define PRODUCT         LHP14_Lite
 
-#define OLED_TIMEOUT 0
+/* マトリクス */
+#define MATRIX_ROWS 5
+#define MATRIX_COLS 14
+#define DIODE_DIRECTION COL2ROW
 
-#define OLED_FONT_H "keyboards/lhp14lite_d/glcdfont_lhp14lite.c"
+/* タッピング設定 */
+#define TAPPING_TERM 200
 
-#define LAYER_STATE_32BIT
+/* ポインティングデバイス（トラックボール等） */
+#ifndef POINTING_DEVICE_ENABLE
+#define POINTING_DEVICE_ENABLE yes
+#endif
+#define POINTING_DEVICE_RESOLUTION 400
 
