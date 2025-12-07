@@ -363,4 +363,10 @@ void matrix_scan_user(void) {
     pointing_device_send();
 }
 
+int16_t dx = x;
+int16_t dy = y;
+if (dx > -30 && dx < 30) dx = 0;
+if (dy > -30 && dy < 30) dy = 0;
+mouse_report.x = dx / 24;
+mouse_report.y = dy / 24;
 
