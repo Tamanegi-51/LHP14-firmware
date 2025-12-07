@@ -340,5 +340,27 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 };
 
+#include "joystick.h"
+#include "pointing_device.h"
+
+void matrix_scan_user(void) {
+    joystick_t joy = joystick_read();
+    report_mouse_t mouse_report = pointing_device_get_report();
+
+    int16_t x = joy.x - 512;
+    int16_t y = joy.y - 512;
+
+    mouse_report.x = x / 32;
+    mouse_report.y = y / 32;
+
+    if (joy.button) {
+        mouse_report.buttons |= MOUSE_BTN1;
+    } else {
+        mouse_report.buttons &= ~MOUSE_BTN1;
+    }
+
+    pointing_device_set_report(mouse_report);
+    pointing_device_send();
+}
 
 
