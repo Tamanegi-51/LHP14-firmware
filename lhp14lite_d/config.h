@@ -4,8 +4,11 @@
 #define JOYSTICK_AXES 2   // X軸とY軸
 
 // ADCピンの定義（例: ProMicroのF4/F5ピン）
-#define JOYSTICK_AXIS_X_PIN F4
-#define JOYSTICK_AXIS_Y_PIN F5
+#define JOYSTICK_X_PIN F4
+#define JOYSTICK_Y_PIN F5
+#define JOYSTICK_BUTTON_PIN F6   // 押し込みスイッチがある場合
+
+
 
 
 #include "config_user.h"
