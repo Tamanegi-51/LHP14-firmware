@@ -1,16 +1,17 @@
-// Copyright 2023 Neo Trinity
-// SPDX-License-Identifier: GPL-2.0-or-later
+// --- LHP14 Lite config.h ---
 
 #pragma once
 
+// マウス更新周期
+#define POINTING_DEVICE_TASK_THROTTLE_MS 10
 
-#define JOYSTICK_BUTTON_COUNT 1
-#define JOYSTICK_AXIS_COUNT 2
-#define JOYSTICK_AXIS_RESOLUTION 8
+// 仮ピン割り当て（あとで差し替え可能）
+#define JOY_X_PIN F6  // A1
+#define JOY_Y_PIN F7  // A0
+#define JOY_SW_PIN D2 // スイッチ
 
-#define OLED_TIMEOUT 0
-
-#define OLED_FONT_H "keyboards/lhp14lite_d/glcdfont_lhp14lite.c"
-
-#define LAYER_STATE_32BIT
+// アナログ中心値とデッドゾーン
+#define JOY_CENTER 512
+#define JOY_DEADZONE 80
+#define JOY_MAX 1023
 
