@@ -24,7 +24,7 @@
 #define JOY_MAX 1023
 
 // --- Remap 用のキーボード設定 ---
-#define MATRIX_ROWS 4
+#define MATRIX_ROWS 5
 #define MATRIX_COLS 4
 
 // 必要ならダイオード方向
