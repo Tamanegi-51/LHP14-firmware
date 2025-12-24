@@ -1,31 +1,31 @@
-// --- LHP14 Lite config.h ---
-
 #pragma once
 
-// --- USB識別情報（Remap対応に必須） ---
-#define VENDOR_ID       0xFEED
-#define PRODUCT_ID      0x6060
+#include "config_common.h"
+
+// USBデバイス情報（info.json と一致）
+#define VENDOR_ID       0xFF14
+#define PRODUCT_ID      0x000C
 #define DEVICE_VER      0x0001
-#define MANUFACTURER    Lime
-#define PRODUCT         LHP14Lite_d
-#define DESCRIPTION     "Remap-compatible firmware with joystick"
+#define MANUFACTURER    Trinity Ironworks
+#define PRODUCT         LHP14Lite
 
-// --- マウス更新周期 ---
-#define POINTING_DEVICE_TASK_THROTTLE_MS 10
+// 行列サイズ（info.json と一致）
+#define MATRIX_ROWS 4
+#define MATRIX_COLS 7
 
-// --- ジョイスティックのピン割り当て ---
-#define JOY_X_PIN F6  // A1
-#define JOY_Y_PIN F7  // A0
-#define JOY_SW_PIN D2 // スイッチ（プルアップ前提）
-
-// --- アナログ中心値とデッドゾーン ---
-#define JOY_CENTER 512
-#define JOY_DEADZONE 80
-#define JOY_MAX 1023
-
-// --- Remap 用のキーボード設定 ---
-#define MATRIX_ROWS 5
-#define MATRIX_COLS 4
-
-// 必要ならダイオード方向
+// ダイオード方向（info.json と一致）
 #define DIODE_DIRECTION COL2ROW
+
+// デバウンス（チャタリング防止）
+#define DEBOUNCE 5
+
+// RGB LED（info.json と一致）
+#define RGB_DI_PIN D3
+#define RGBLED_NUM 20
+
+// --- ジョイスティック設定 ---
+#define JOY_X_PIN F0
+#define JOY_Y_PIN F1
+#define JOY_SW_PIN F4
+#define JOY_CENTER 512
+#define JOY_DEADZONE 50
