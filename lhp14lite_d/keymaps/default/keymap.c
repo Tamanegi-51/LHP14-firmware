@@ -1,8 +1,10 @@
-// --- LHP14 Lite keymap.c（ジョイスティック追加部分） ---
+// --- LHP14 Lite keymap.c (Remap対応 + ジョイスティック) ---
 
+#include QMK_KEYBOARD_H
 #include "analog.h"
 #include "pointing_device.h"
 
+// ジョイスティック状態
 static int16_t joy_x = 0;
 static int16_t joy_y = 0;
 static bool    joy_sw = false;
@@ -43,6 +45,17 @@ report_mouse_t pointing_device_task(report_mouse_t mouse_report) {
 
     return mouse_report;
 }
+
+// --- キーマップ定義（Remap対応に必須） ---
+
+const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+    [0] = LAYOUT_ortho_4x4(
+        KC_A, KC_B, KC_C, KC_D,
+        KC_E, KC_F, KC_G, KC_H,
+        KC_I, KC_J, KC_K, KC_L,
+        KC_M, KC_N, KC_O, KC_P
+    )
+};
 
 
 
