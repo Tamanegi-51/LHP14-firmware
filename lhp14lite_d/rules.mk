@@ -1,17 +1,15 @@
 # --- VIA / Remap 対応 ---
 VIA_ENABLE = yes
 
-# --- ジョイスティック機能を有効化 ---
+# --- ジョイスティック機能 ---
 JOYSTICK_ENABLE = yes
-
-# --- アナログ入力（ジョイスティック用） ---
 ANALOG_ENABLE = yes
 
 # --- OLED 表示 ---
 OLED_ENABLE = yes
 
-# --- RGB ライト（必要なら） ---
+# --- RGB ライト ---
 RGBLIGHT_ENABLE = yes
 
-# --- その他（必要に応じて） ---
+# --- 最適化（任意・推奨） ---
 LTO_ENABLE = yes
