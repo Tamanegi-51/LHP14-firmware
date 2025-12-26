@@ -5,7 +5,7 @@
 #include "joystick.h"
 #include "analog.h"
 
-// ADC Measured value
+// --- ジョイスティックのキャリブレーション値 ---
 #define min_x 150
 #define med_x 479
 #define max_x 782
@@ -14,17 +14,12 @@
 #define med_y 598
 #define max_y 989
 
-#define adc_x F5
-#define adc_y F4
-
+// --- ★後期版基板用：ジョイスティックの実ピン割り当て ---
+#define adc_x F0   // X軸（A0）
+#define adc_y F1   // Y軸（A1）
 
 #define TST 0
 #define RGB 1
-
-
-
-
-
 
 enum custom_keycodes {
   RGBRST = SAFE_RANGE
@@ -44,77 +39,61 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   return true;
 };
 
+// --- QMK 新方式：自動アナログ読み取り設定 ---
 joystick_config_t joystick_axes[JOYSTICK_AXIS_COUNT] = {
-    [0] = JOYSTICK_AXIS_IN(adc_x, max_x, med_x, min_x),
-    [1] = JOYSTICK_AXIS_IN(adc_y, min_y, med_y, max_y),
+    [0] = JOYSTICK_AXIS_IN(adc_x, max_x, med_x, min_x),  // X軸
+    [1] = JOYSTICK_AXIS_IN(adc_y, min_y, med_y, max_y),  // Y軸
 };
 
-
-
+// --- OLED 表示（生値確認用） ---
 void render_layer(void) {
 
     char val_str[20];
-    
+
+    // --- X軸 ---
     oled_set_cursor(0, 0);
     uint16_t val = analogReadPin(adc_x);
     static uint16_t min_xx = 1023;
     static uint16_t max_xx = 0;
-      
-      if (val > max_xx) {
-         max_xx = val;
-      };
-      
-      if (val < min_xx) {
-         min_xx = val;
-      };
 
-    
+    if (val > max_xx) max_xx = val;
+    if (val < min_xx) min_xx = val;
+
     sprintf(val_str, "X:%-4d", val);
     oled_write(val_str, false);
     sprintf(val_str, " min%-4d", min_xx);
     oled_write(val_str, false);
-    sprintf(val_str, "max%-4d", max_xx);
+    sprintf(val_str, " max%-4d", max_xx);
     oled_write(val_str, false);
-    
-    
+
+    // --- Y軸 ---
     oled_set_cursor(0, 1);
     val = analogReadPin(adc_y);
     static uint16_t min_yy = 1023;
     static uint16_t max_yy = 0;
-      
-      if (val > max_yy) {
-         max_yy = val;
-      };
-      
-      if (val < min_yy) {
-         min_yy = val;
-      };
+
+    if (val > max_yy) max_yy = val;
+    if (val < min_yy) min_yy = val;
 
     sprintf(val_str, "Y:%-4d", val);
     oled_write(val_str, false);
     sprintf(val_str, " min%-4d", min_yy);
     oled_write(val_str, false);
-    sprintf(val_str, "max%-4d", max_yy);
+    sprintf(val_str, " max%-4d", max_yy);
     oled_write(val_str, false);
-    
-    // special thanks marusii
 
-
+    // --- Layer 表示 ---
     oled_set_cursor(0, 3);
-    // Host Keyboard Layer Status
     oled_write_P(PSTR("Layer: "), false);
 
     switch (get_highest_layer(layer_state)) {
         case TST:
             oled_write_P(PSTR("KEY TEST\n"), false);
-            //rgblight_sethsv(0, 255, 180);
             break;
         case RGB:
             oled_write_P(PSTR("RGB LED TEST\n"), false);
-            //rgblight_sethsv(128, 255, 180);
-            break;     
+            break;
         default:
-            // Or use the write_ln shortcut over adding '\n' to the end of your string
             oled_write_ln_P(PSTR("Undefined"), false);
     }
 };
@@ -124,60 +103,24 @@ bool oled_task_user(void) {
     return false;
 };
 
+void suspend_power_down_kb(void) { oled_off(); };
+void suspend_wakeup_init_kb(void) { oled_on(); };
 
-
-
-
-void suspend_power_down_kb(void) {
-    oled_off();
-};
-
-void suspend_wakeup_init_kb(void) {
-    oled_on();
-};
-
-
-
-
-
+// --- キーマップ ---
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
-  /* TST
-   * ,----------------------------------.   
-   * |  Q   |  W   |  E   |  R   |  T   |   
-   * |------+------+------+------+------|   
-   * |  A   |  S   |  D   |  F   |  G   |   
-   * |------+------+------+------+------|   
-   * |  Z   |  X   |  C   |  V   |  B   |   
-   * |------+------+------+------+------+------+------.  
-   * |  1   |  2   |  3   |  4   |  5   |JsPush|RGB   |  
-   * `------------------------------------------------'  
-   */
-  [TST] = LAYOUT( \
-    KC_Q,   KC_W,   KC_E,   KC_R,    KC_T,  \
-    KC_A,   KC_S,   KC_D,   KC_F,    KC_G,  \
-    KC_Z,   KC_X,   KC_C,   KC_V,    KC_B,  \
-    KC_1,   KC_2,   KC_3,   KC_4,    KC_5,  JS_0,  TO(RGB) \
+  [TST] = LAYOUT(
+    KC_Q,   KC_W,   KC_E,   KC_R,    KC_T,
+    KC_A,   KC_S,   KC_D,   KC_F,    KC_G,
+    KC_Z,   KC_X,   KC_C,   KC_V,    KC_B,
+    KC_1,   KC_2,   KC_3,   KC_4,    KC_5,  JS_0,  TO(RGB)
   ),
 
-  /* RGB
-   * ,----------------------------------.   
-   * |RGBTOG|RGBHUI|RGBHUD|RGBSAI|RGBSAD|   
-   * |------+------+------+------+------|   
-   * |RGBMOD|RGBRST|RGBVAI|RGBVAD|      |   
-   * |------+------+------+------+------|   
-   * |      |      |      |      |      |   
-   * |------+------+------+------+------+------+------.  
-   * |      |      |      |      |      |JsPush|TST   |  
-   * `------------------------------------------------'  
-   */
-  [RGB] = LAYOUT( \
-    UG_TOGG,   UG_HUEU,   UG_HUED,    UG_SATU,    UG_SATD, \
-    UG_NEXT,   RGBRST,    UG_VALU,    UG_VALD,    XXXXXXX, \
-    XXXXXXX,   XXXXXXX,   XXXXXXX,    XXXXXXX,    XXXXXXX, \
-    XXXXXXX,   XXXXXXX,   XXXXXXX,    XXXXXXX,    XXXXXXX, JS_0,  TO(TST) \
+  [RGB] = LAYOUT(
+    UG_TOGG,   UG_HUEU,   UG_HUED,    UG_SATU,    UG_SATD,
+    UG_NEXT,   RGBRST,    UG_VALU,    UG_VALD,    XXXXXXX,
+    XXXXXXX,   XXXXXXX,   XXXXXXX,    XXXXXXX,    XXXXXXX,
+    XXXXXXX,   XXXXXXX,   XXXXXXX,    XXXXXXX,    XXXXXXX, JS_0,  TO(TST)
   ),
 
 };
-
-
