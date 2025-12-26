@@ -1,55 +1,126 @@
+// Copyright 2025 Neo Trinity
+// SPDX-License-Identifier: GPL-2.0-or-later
+
 #include QMK_KEYBOARD_H
+#include "joystick.h"
 #include "analog.h"
-#include "pointing_device.h"
 
-// --- ジョイスティック状態 ---
-static int16_t joy_x = 0;
-static int16_t joy_y = 0;
-static bool    joy_sw = false;
+// --- ジョイスティックのキャリブレーション値 ---
+#define min_x 150
+#define med_x 479
+#define max_x 782
 
-// --- キーマップ（QMKが持っている正式な LAYOUT_ortho_5x4 を使用） ---
-const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    [0] = LAYOUT_ortho_5x4(
-        KC_Q, KC_W, KC_E, KC_R,
-        KC_A, KC_S, KC_D, KC_F,
-        KC_Z, KC_X, KC_C, KC_V,
-        KC_1, KC_2, KC_3, KC_4,
-        KC_SPC, KC_LALT, KC_LGUI, KC_LCTL
-    )
+#define min_y 200
+#define med_y 598
+#define max_y 989
+
+// --- ★後期版基板用：ジョイスティックの実ピン割り当て ---
+#define adc_x F0   // X軸（A0）
+#define adc_y F1   // Y軸（A1）
+
+#define TST 0
+#define RGB 1
+
+enum custom_keycodes {
+  RGBRST = SAFE_RANGE
 };
 
-// --- ジョイスティック読み取り ---
-static void read_joystick(void) {
-    uint16_t raw_x = analogReadPin(JOY_X_PIN);
-    uint16_t raw_y = analogReadPin(JOY_Y_PIN);
-    bool     sw    = (readPin(JOY_SW_PIN) == 0);
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  switch (keycode) {
+    case RGBRST:
+      #ifdef RGBLIGHT_ENABLE
+        if (record->event.pressed) {
+          eeconfig_update_rgblight_default();
+          rgblight_enable();
+        }
+      #endif
+      break;
+  }
+  return true;
+};
 
-    int16_t dx = (int16_t)raw_x - JOY_CENTER;
-    int16_t dy = (int16_t)raw_y - JOY_CENTER;
+// --- QMK 新方式：自動アナログ読み取り設定 ---
+joystick_config_t joystick_axes[JOYSTICK_AXIS_COUNT] = {
+    [0] = JOYSTICK_AXIS_IN(adc_x, max_x, med_x, min_x),  // X軸
+    [1] = JOYSTICK_AXIS_IN(adc_y, min_y, med_y, max_y),  // Y軸
+};
 
-    if (dx > -JOY_DEADZONE && dx < JOY_DEADZONE) dx = 0;
-    if (dy > -JOY_DEADZONE && dy < JOY_DEADZONE) dy = 0;
+// --- OLED 表示（生値確認用） ---
+void render_layer(void) {
 
-    dx /= 32;
-    dy /= 32;
+    char val_str[20];
 
-    joy_x = dx;
-    joy_y = -dy;
-    joy_sw = sw;
-}
+    // --- X軸 ---
+    oled_set_cursor(0, 0);
+    uint16_t val = analogReadPin(adc_x);
+    static uint16_t min_xx = 1023;
+    static uint16_t max_xx = 0;
 
-// --- マウスレポート生成 ---
-report_mouse_t pointing_device_task(report_mouse_t mouse_report) {
-    read_joystick();
+    if (val > max_xx) max_xx = val;
+    if (val < min_xx) min_xx = val;
 
-    mouse_report.x = joy_x;
-    mouse_report.y = joy_y;
+    sprintf(val_str, "X:%-4d", val);
+    oled_write(val_str, false);
+    sprintf(val_str, " min%-4d", min_xx);
+    oled_write(val_str, false);
+    sprintf(val_str, " max%-4d", max_xx);
+    oled_write(val_str, false);
 
-    if (joy_sw) {
-        mouse_report.buttons |= MOUSE_BTN1;
-    } else {
-        mouse_report.buttons &= ~MOUSE_BTN1;
+    // --- Y軸 ---
+    oled_set_cursor(0, 1);
+    val = analogReadPin(adc_y);
+    static uint16_t min_yy = 1023;
+    static uint16_t max_yy = 0;
+
+    if (val > max_yy) max_yy = val;
+    if (val < min_yy) min_yy = val;
+
+    sprintf(val_str, "Y:%-4d", val);
+    oled_write(val_str, false);
+    sprintf(val_str, " min%-4d", min_yy);
+    oled_write(val_str, false);
+    sprintf(val_str, " max%-4d", max_yy);
+    oled_write(val_str, false);
+
+    // --- Layer 表示 ---
+    oled_set_cursor(0, 3);
+    oled_write_P(PSTR("Layer: "), false);
+
+    switch (get_highest_layer(layer_state)) {
+        case TST:
+            oled_write_P(PSTR("KEY TEST\n"), false);
+            break;
+        case RGB:
+            oled_write_P(PSTR("RGB LED TEST\n"), false);
+            break;
+        default:
+            oled_write_ln_P(PSTR("Undefined"), false);
     }
+};
 
-    return mouse_report;
-}
+bool oled_task_user(void) {
+    render_layer();
+    return false;
+};
+
+void suspend_power_down_kb(void) { oled_off(); };
+void suspend_wakeup_init_kb(void) { oled_on(); };
+
+// --- キーマップ ---
+const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+
+  [TST] = LAYOUT(
+    KC_Q,   KC_W,   KC_E,   KC_R,    KC_T,
+    KC_A,   KC_S,   KC_D,   KC_F,    KC_G,
+    KC_Z,   KC_X,   KC_C,   KC_V,    KC_B,
+    KC_1,   KC_2,   KC_3,   KC_4,    KC_5,  JS_0,  TO(RGB)
+  ),
+
+  [RGB] = LAYOUT(
+    UG_TOGG,   UG_HUEU,   UG_HUED,    UG_SATU,    UG_SATD,
+    UG_NEXT,   RGBRST,    UG_VALU,    UG_VALD,    XXXXXXX,
+    XXXXXXX,   XXXXXXX,   XXXXXXX,    XXXXXXX,    XXXXXXX,
+    XXXXXXX,   XXXXXXX,   XXXXXXX,    XXXXXXX,    XXXXXXX, JS_0,  TO(TST)
+  ),
+
+};
