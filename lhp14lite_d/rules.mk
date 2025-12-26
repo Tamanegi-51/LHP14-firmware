@@ -1,20 +1,17 @@
-# --- LHP14 Lite rules.mk ---
-
-# キーボードの基本設定
-MCU = atmega32u4
-
-# Remap / VIA 対応
+# --- VIA / Remap 対応 ---
 VIA_ENABLE = yes
 
-# 最適化（Pro Micro では安定性が上がる）
-LTO_ENABLE = yes
+# --- ジョイスティック機能を有効化 ---
+JOYSTICK_ENABLE = yes
 
-# ジョイスティック（アナログ入力）
-POINTING_DEVICE_ENABLE = yes
+# --- アナログ入力（ジョイスティック用） ---
 ANALOG_ENABLE = yes
 
-# マウスレポートを使う
-MOUSEKEY_ENABLE = yes
+# --- OLED 表示 ---
+OLED_ENABLE = yes
 
-# コンパイル高速化（任意）
-EXTRAKEY_ENABLE = yes
+# --- RGB ライト（必要なら） ---
+RGBLIGHT_ENABLE = yes
+
+# --- その他（必要に応じて） ---
+LTO_ENABLE = yes
